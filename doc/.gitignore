@@ -1,0 +1,25 @@
+
+# Temporary
+.~lock.*
+.*.swp
+
+# TeX outputs
+*.aux
+*.toc
+*.out
+*.log
+*.gz
+*.pdf
+
+# List of figures
+*.lof
+
+# BibTeX outputs
+*.bbl
+*.blg
+
+# TeX: generated glossary
+*.acn
+*.glo
+*.glsdefs
+*.ist
