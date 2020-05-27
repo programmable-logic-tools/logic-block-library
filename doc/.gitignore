@@ -1,7 +1,10 @@
 
+main.svg
+
 # Temporary
 .~lock.*
 .*.swp
+*.bak
 
 # TeX outputs
 *.aux
