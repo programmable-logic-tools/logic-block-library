@@ -1,0 +1,46 @@
+[*]
+[*] GTKWave Analyzer v3.3.102 (w)1999-2019 BSI
+[*] Fri Feb 14 21:33:02 2020
+[*]
+[dumpfile] "testbench.lx2"
+[dumpfile_mtime] "Fri Feb 14 21:32:26 2020"
+[dumpfile_size] 697
+[savefile] "testbench.gtkw"
+[timestart] 75
+[size] 1920 992
+[pos] -1 -1
+*-2.988071 90 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test.
+[sst_width] 327
+[signals_width] 222
+[sst_expanded] 1
+[sst_vpaned_height] 344
+@28
+[color] 2
+test.clock[0]
+[color] 2
+test.trigger[0]
+test.spi_stimulus_mut.internal_ss[0]
+test.spi_stimulus_mut.ss[0]
+@24
+[color] 3
+test.spi_stimulus_mut.sclk_delay_counter[0]
+@28
+test.spi_stimulus_mut.internal_sclk[0]
+test.spi_stimulus_mut.sclk[0]
+@24
+[color] 3
+test.spi_stimulus_mut.sclk_edge_counter[3:0]
+@28
+test.spi_stimulus_mut.abort[0]
+test.spi_stimulus_mut.aborted[0]
+test.spi_stimulus_mut.complete[0]
+@29
+test.spi_stimulus_mut.invalidate[0]
+@28
+test.spi_stimulus_mut.valid[0]
+@24
+[color] 3
+test.spi_stimulus_mut.state[2:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.102 (w)1999-2019 BSI
+[*] Mon Jan 20 12:30:00 2020
+[*]
+[dumpfile] "testbench.lx2"
+[dumpfile_mtime] "Mon Jan 20 12:29:14 2020"
+[dumpfile_size] 699
+[savefile] "testbench.gtkw"
+[timestart] 0
+[size] 1920 992
+[pos] -1 -1
+*-3.988071 22 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test.
+[sst_width] 327
+[signals_width] 310
+[sst_expanded] 1
+[sst_vpaned_height] 619
+@28
+test.clock[0]
+test.stimulus.reset[0]
+[color] 2
+test.stimulus.clear[0]
+[color] 2
+test.stimulus.add[0]
+[color] 2
+test.stimulus.show[0]
+@22
+[color] 3
+test.average0.sample_value[3:0]
+@24
+[color] 3
+test.average0.accumulator[5:0]
+[color] 3
+test.average0.mean_value[3:0]
+[pattern_trace] 1
+[pattern_trace] 0

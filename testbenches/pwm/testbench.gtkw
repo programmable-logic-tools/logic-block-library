@@ -1,0 +1,60 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Wed Feb 26 12:42:32 2020
+[*]
+[dumpfile] "testbench.lx2"
+[dumpfile_mtime] "Wed Feb 26 12:42:19 2020"
+[dumpfile_size] 16774
+[savefile] "testbench.gtkw"
+[timestart] 0
+[size] 1920 992
+[pos] -1 -1
+*-4.988071 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test.
+[sst_width] 327
+[signals_width] 361
+[sst_expanded] 1
+[sst_vpaned_height] 475
+@28
+test.pwm0.clock[0]
+test.reset[0]
+@200
+-
+-PWM counter:
+@28
+test.counter0.reset[0]
+test.counter0.start[0]
+test.counter0.internal_start[0]
+test.counter0.stop[0]
+test.counter0.counting[0]
+@24
+test.counter0.count[7:0]
+@200
+-
+-PWM generator:
+@28
+[color] 2
+test.pwm0.load_enable[0]
+@24
+[color] 2
+test.pwm0.tick_count_highside[7:0]
+[color] 2
+test.pwm0.tick_number_rising_edge_highside[7:0]
+[color] 2
+test.pwm0.tick_number_falling_edge_highside[7:0]
+[color] 2
+test.pwm0.tick_count_lowside[7:0]
+[color] 2
+test.pwm0.tick_number_rising_edge_lowside[7:0]
+[color] 2
+test.pwm0.tick_number_falling_edge_lowside[7:0]
+@200
+-
+-Generated gate signals:
+@28
+[color] 3
+test.pwm0.highside_output[0]
+[color] 3
+test.pwm0.lowside_output[0]
+[pattern_trace] 1
+[pattern_trace] 0
