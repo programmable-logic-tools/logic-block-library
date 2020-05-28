@@ -31,7 +31,7 @@ initial show <= 0;
 wire pulsified_reset;
 pulsifier reset_pulsifier(
     .clock(clock),
-    .signal(reset),
+    .original_signal(reset),
     .pulsified_signal(pulsified_reset)
     );
 
