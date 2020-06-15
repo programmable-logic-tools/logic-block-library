@@ -47,23 +47,28 @@ initial #120 $finish;
 
 
 /**
- * Test SPI stimulus generation
+ * Test all four SPI modes
  */
-spi_stimulus
-    #(
-        .bitcount       (4),
-        .ss_polarity    (0),
-        .sclk_polarity  (1),
-        .tick_count_sclk_delay_leading  (1),
-        .tick_count_sclk_delay_trailing (1)
-    )
-    spi_stimulus_mut
-    (
-        .clock      (clock),
-        .trigger    (trigger),
-        .abort      (abort),
-        .invalidate (invalidate)
-    );
+genvar ss_polarity, clock_polarity;
+generate
+    for (ss_polarity=0; ss_polarity<2; ss_polarity=ss_polarity+1)
+        for (clock_polarity=0; clock_polarity<2; clock_polarity=clock_polarity+1)
+            spi_stimulus
+                #(
+                    .bitcount       (4),
+                    .ss_polarity    (ss_polarity),
+                    .sclk_polarity  (clock_polarity),
+                    .tick_count_sclk_delay_leading  (1),
+                    .tick_count_sclk_delay_trailing (1)
+                )
+                spi_stimulus_mut
+                (
+                    .clock      (clock),
+                    .trigger    (trigger),
+                    .abort      (abort),
+                    .invalidate (invalidate)
+                );
+endgenerate
 
 
 endmodule

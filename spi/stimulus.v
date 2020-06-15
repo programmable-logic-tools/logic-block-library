@@ -40,12 +40,16 @@ module spi_stimulus
         parameter ss_polarity = 0,
 
         /**
-         * CPOL = 0: The clock is low at beginning and end of the transfer.
-         * CPOL = 1: The clock is high at beginning and end of the transfer.
+         * The clock is...
+         *  CPOL = 0: ...low...
+         *  CPOL = 1: ...high...
+         * ...at beginning and end of a transfer.
          *
          * Source: https://upload.wikimedia.org/wikipedia/commons/6/6b/SPI_timing_diagram2.svg
          */
         parameter sclk_polarity = 0,
+
+        // The clock phase (CPHA) must be configured in the transmitter respectively receiver.
 
         /**
          * Number of clock ticks after the activation of the slave-select signal,
