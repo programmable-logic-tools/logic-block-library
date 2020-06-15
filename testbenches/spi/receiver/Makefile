@@ -6,11 +6,11 @@
 
 SRCS = $(wildcard testbench*.v)
 
-IVFLAGS += -I../../
+IVFLAGS += -I../../../
 
 
 all: simulate
 
-include ../testbench.mk
+include ../../testbench.mk
 
 clean: clean-testbench
