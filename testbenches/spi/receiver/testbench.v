@@ -7,7 +7,7 @@
 
 module test;
 
-parameter bitcount = 4;
+parameter bitcount = 8;
 parameter ss_polarity = 1;
 parameter sclk_polarity = 0;
 parameter sclk_phase = 1;
@@ -29,13 +29,13 @@ initial
 begin
     #3 trigger <= 1;
     #4 trigger <= 0;
-    #60 trigger <= 1;
+    #80 trigger <= 1;
     #4 trigger <= 0;
 end
 // initial #5 trigger <= 0;
 
 // End of test signal generation
-initial #150 $finish;
+initial #200 $finish;
 
 
 /**
@@ -45,7 +45,7 @@ initial #150 $finish;
 wire ss, sclk;
 reg mosi;
 initial mosi <= 1;
-initial #60 mosi <= 0;
+initial #58 mosi <= 0;
 
 spi_stimulus
     #(
@@ -69,7 +69,7 @@ spi_receiver
         .ss_polarity            (ss_polarity),
         .sclk_polarity          (sclk_polarity),
         .sclk_phase             (sclk_phase),
-        .bitcount               (bitcount-1),
+        .bitcount               (bitcount),
         .msb_first              (msb_first),
         .use_gated_output       (1),
         .use_external_trigger   (0)

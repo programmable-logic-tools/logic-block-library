@@ -156,7 +156,7 @@ end
 /*
  * Sample the data input
  */
-reg[$clog2(bitcount):0] bitcounter = 'hxxx;
+reg[$clog2(bitcount):0] bitcounter = 0;
 reg bitcounter_enable = 0;
 
 always @(posedge internal_sclk or posedge internal_trigger)

@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.101 (w)1999-2019 BSI
-[*] Thu Oct 24 13:09:24 2019
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Mon Jun 15 14:27:21 2020
 [*]
 [dumpfile] "testbench.lx2"
-[dumpfile_mtime] "Thu Oct 24 12:52:56 2019"
-[dumpfile_size] 912
+[dumpfile_mtime] "Mon Jun 15 14:26:38 2020"
+[dumpfile_size] 957
 [savefile] "testbench.gtkw"
 [timestart] 0
-[size] 1920 987
+[size] 1920 992
 [pos] -1 -1
-*-3.988071 49 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-3.988071 14 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test.
 [treeopen] test.mut.
 [sst_width] 327
@@ -25,18 +25,19 @@ test.mut.ss[0]
 test.mut.sclk[0]
 [color] 3
 test.mut.sdi[0]
+@200
+-
+@28
 test.mut.internal_ss[0]
 test.mut.internal_sclk[0]
 test.mut.internal_trigger[0]
 test.mut.bitcounter_enable[0]
 @24
-test.mut.bitcounter[2:0]
-@28
-test.mut.internal_data[2:0]
-@29
-test.mut.data[2:0]
+test.mut.bitcounter[4:0]
 @28
 test.mut.internal_complete[0]
 test.mut.complete[0]
+test.mut.internal_data[7:0]
+test.mut.data[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
