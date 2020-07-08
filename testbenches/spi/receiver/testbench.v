@@ -47,11 +47,10 @@ reg mosi;
 initial mosi <= 1;
 initial #58 mosi <= 0;
 
-spi_stimulus
-    #(
+spi_stimulus #(
         .bitcount       (bitcount),
-        .ss_polarity    (ss_polarity),
-        .sclk_polarity  (sclk_polarity)
+        .ss_polarity    (1),
+        .sclk_polarity  (0)
     )
     stimulus
     (
@@ -64,8 +63,7 @@ spi_stimulus
 /**
  * SPI receiver as slave
  */
-spi_receiver
-    #(
+spi_receiver #(
         .ss_polarity            (ss_polarity),
         .sclk_polarity          (sclk_polarity),
         .sclk_phase             (sclk_phase),
@@ -78,6 +76,24 @@ spi_receiver
     (
         .clock      (clock),
         .ss         (ss),
+        .sclk       (sclk),
+        .sdi        (mosi)
+    );
+
+
+spi_receiver #(
+        .ss_polarity            (ss_polarity),
+        .sclk_polarity          (sclk_polarity),
+        .sclk_phase             (sclk_phase),
+        .bitcount               (bitcount),
+        .msb_first              (msb_first),
+        .use_gated_output       (1),
+        .use_external_trigger   (0)
+    )
+    mut2
+    (
+        .clock      (clock),
+        .ss         (~ss),
         .sclk       (sclk),
         .sdi        (mosi)
     );
