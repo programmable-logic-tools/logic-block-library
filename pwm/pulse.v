@@ -1,15 +1,16 @@
 
-`ifndef TIMER_V
-`define TIMER_V
+`ifndef PULSE_V
+`define PULSE_V
 
-module timer
+module pulse
     #(
         parameter bitwidth = 10
         )
     (
         input clock,
         input reset,
-        input [bitwidth-1:0] counter,
+
+        input [bitwidth-1:0] counter_value,
         input [bitwidth-1:0] tick_number_rising_edge,
         input [bitwidth-1:0] tick_number_falling_edge,
 
@@ -20,9 +21,9 @@ initial generated_signal <= 0;
 
 always @(posedge clock)
 begin
-    if ((counter == tick_number_rising_edge) && (reset == 0))
+    if ((counter_value == tick_number_rising_edge) && (reset == 0))
         generated_signal <= 1;
-    if ((counter == tick_number_falling_edge) || (reset == 1))
+    if ((counter_value == tick_number_falling_edge) || (reset == 1))
         generated_signal <= 0;
 end
 
