@@ -62,13 +62,13 @@ module counter #(
             output reg counting,
 
             /** For use in other modules or for debugging, the internal counter registers are exposed. */
-            output reg[bitwidth-1:0] count,
+            output reg[bitwidth-1:0] value,
 
             /** A rising edge on the overflow signal indicates, that the parameterized number of ticks have elapsed. */
             output reg overflow
             );
 
-initial count <= 0;
+initial value <= 0;
 initial counting <= 0;
 initial overflow <= 0;
 
@@ -134,7 +134,7 @@ begin
     else begin
         if (internal_stop == 1)
             counting <= 0;
-        if ((autoreload == 0) && (count >= counter_overflow-1))
+        if ((autoreload == 0) && (value >= counter_overflow-1))
             counting <= 0;
     end
 end
@@ -150,24 +150,24 @@ begin
          * A rising edge or high level on the reset signal resets the counter value.
          * If counting was previously enabled, it will resume as soon as the reset signal returns to low.
          */
-        count <= 0;
+        value <= 0;
         overflow <= 0;
     end
     else begin
         // While enabled (started and not stopped), the counter counts.
         if (counting)
         begin
-            count <= count + 1;
+            value <= value + 1;
             overflow <= 0;
         end
 
-        // With count reaching the value of counter_overflow, the overflow signal goes high.
-        if (count >= counter_overflow-1)
+        // When reaching the value of counter_overflow, the overflow signal goes high.
+        if (value >= counter_overflow-1)
         begin
             overflow <= 1;
 
             if (autoreload != 0)
-                count <= 0;
+                value <= 0;
         end
 
         // The restart behaviour is governed by a module parameter:
@@ -176,7 +176,7 @@ begin
             // It is possible to restart the counter, after it has overflown (or using the reset signal).
             if (overflow & internal_start)
             begin
-                count <= 0;
+                value <= 0;
                 overflow <= 0;
             end
         end
@@ -184,7 +184,7 @@ begin
             // A rising edge on the start signal restarts counting.
             if (internal_start)
             begin
-                count <= 0;
+                value <= 0;
                 overflow <= 0;
             end
         end
