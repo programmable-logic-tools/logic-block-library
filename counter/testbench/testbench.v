@@ -53,7 +53,7 @@ reg start7 = 0;
 initial #7 start7 <= 1;
 initial #9 start7 <= 0;
 initial #49 start7 <= 1;
-initial #50 start7 <= 0;
+initial #51 start7 <= 0;
 
 reg stop7 = 0;
 initial #91 stop7 <= 1;
@@ -188,6 +188,27 @@ counter #(
         .reload_value  (counter_overflow),
         .start      (1'b0),
         .stop       (1'b0)
+        );
+
+/*
+ * Reloading the counter with different values
+ */
+reg[bitwidth-1:0] reload_value = 12;
+initial #70 reload_value <= 8;
+initial #90 reload_value <= 5;
+initial #110 reload_value <= 1;
+initial #130 reload_value <= 0;
+counter #(
+    .bitwidth                   (bitwidth),
+    .enable_autoreload_input    (1)
+    )
+    counter9 (
+        .clock          (clock),
+        .reset          (1'b0),
+        .autoreload     (1'b1),
+        .reload_value   (reload_value),
+        .start          (start1),
+        .stop           (1'b0)
         );
 
 

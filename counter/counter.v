@@ -92,6 +92,12 @@ module counter #(
              */
             input[bitwidth-1:0] reload_value,
 
+            /**
+             * The internally used reload value is only updated
+             * upon an update i.e. counter overflow event.
+             */
+            output reg[bitwidth-1:0] active_reload_value,
+
             /** A high level on the counting signal indicates, that the counter is currently counting. */
             output reg counting,
 
@@ -145,14 +151,30 @@ else begin
 end
 
 /*
+ * Update internally used reload value
+ */
+initial active_reload_value <= 0;
+wire illegal_reload_value = (reload_value == 0);
+wire reload_trigger = (counting == 0) || (overflow == 1);
+always @(posedge clock)
+begin
+    if (reload_trigger)
+        active_reload_value[bitwidth-1:0] <= reload_value[bitwidth-1:0];
+end
+
+/*
  * Decide, whether to count or not
  */
+wire overflow_latch = (value >= active_reload_value);
 always @(posedge clock)
 begin
     if (counting == 0)
     begin
+        if (illegal_reload_value)
+            counting <= 0;
+
         // The counter is inactive
-        if (enable_autostart_input > 0)
+        else if (enable_autostart_input > 0)
         begin
             // The autostart input shall be evaluated
             if (autostart == 0)
@@ -179,15 +201,19 @@ begin
         if (enable_autoreload_input > 0)
         begin
             // The autoreload input shall be evaluated
-            if ((autoreload == 0) && (value >= reload_value))
+            if ((overflow_latch == 1) && ((autoreload == 0) || (illegal_reload_value == 1)))
                 counting <= 0;
         end
         else begin
             // The autoreload input shall be disregarded
-            if (value >= reload_value)
+            if (overflow_latch == 1)
                 counting <= 0;
         end
     end
+
+    // When the reload value is zero the counter is blocked.
+    if (active_reload_value == 0)
+        counting <= 0;
 end
 
 /*
@@ -213,7 +239,7 @@ begin
         end
 
         // When reaching the value of period, the overflow signal goes high.
-        if (value >= reload_value)
+        if (overflow_latch)
         begin
             overflow <= 1;
 
