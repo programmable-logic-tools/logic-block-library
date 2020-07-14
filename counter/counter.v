@@ -4,32 +4,39 @@
  *
  * Please note:
  * In order to avoid unexpected behaviour when instantiating this module,
- * the inputs start, stop and reset should always be connected or tied to a defined level.
+ * the inputs start, stop and reset should always be connected
+ * or, respectively, be assigned a constant value.
  */
+
 `ifndef COUNTER_V
 `define COUNTER_V
 
 `include "pulsifier.v"
 
 module counter #(
-            /** The counter_overflow parameter configures the number of clock ticks before a counter overflow occurs. */
-            parameter counter_overflow = 8,
-            parameter bitwidth = $clog2(counter_overflow),
-
             /**
-             * When this parameter is 1, the counter begins counting from zero immediately after startup.
-             * autostart does NOT imply autoreload.
+             * The number of bits reserved for the counter value.
+             * The maximum allowed auto-reload value is (2^bitwidth)-2,
+             * i.e. bitwidth must be chosen, such that (2^bitwidth)-1 <= (reload_value+1),
+             * because without auto-reload enabled the counter value reaches (reload_value+1).
              */
-            parameter autostart = 0,
+            parameter bitwidth = 8,
 
             /**
-             * When this parameter is 1, the counter does not stop when it overflows, but instead continues counting from zero.
+             * A non-zero value enables the evaluation of the autostart input.
              */
-            parameter autoreload = 0,
+            parameter enable_autostart_input = 0,
 
             /**
-             * This parameter configures, whether the counter is reset when receiving start signals while counting (parameter=1),
-             * or whether untimely start signals are ignored (parameter=0).
+             * A non-zero value enables the evaluation of the auto-reload input.
+             */
+            parameter enable_autoreload_input = 0,
+
+            /**
+             * When this parameter is zero,
+             * all start signals are ignored if the counter is already counting.
+             * When this parameter is non-zero,
+             * the counter resets when receiving start signals while counting,
              */
             parameter start_resets_counting = 0,
 
@@ -57,6 +64,33 @@ module counter #(
 
             /** A high level on the start signal for at least one clock tick stops the counter. */
             input stop,
+
+            /**
+             * With a non-zero value on this input
+             * the counter begins counting without waiting for a start signal.
+             * autostart does NOT imply autoreload though,
+             * meaning that the counter stops when the overflow value is reached.
+             * With autostart, when the counter is reset (by the reset signal),
+             * it will immediately begin counting again.
+             * When start_resets_counting is enabled,
+             * a start signal still resets the counter.
+             * Requires enable_autostart_input.
+             */
+            input autostart,
+
+            /**
+             * With a non-zero value on this input
+             * the counter does not stop when it overflows,
+             * but instead continues counting from zero.
+             * Requires enable_autoreload_input.
+             */
+            input autoreload,
+
+            /**
+             * The counter value after which the
+             * counter overflows and resets to zero
+             */
+            input[bitwidth-1:0] reload_value,
 
             /** A high level on the counting signal indicates, that the counter is currently counting. */
             output reg counting,
@@ -113,29 +147,46 @@ end
 /*
  * Decide, whether to count or not
  */
-reg autostart_expired = 0;
 always @(posedge clock)
 begin
     if (counting == 0)
     begin
-        if (autostart == 0)
+        // The counter is inactive
+        if (enable_autostart_input > 0)
         begin
+            // The autostart input shall be evaluated
+            if (autostart == 0)
+            begin
+                if (internal_start == 1)
+                    counting <= 1;
+            end
+            else begin
+                if ((value == 0) && (reset == 0))
+                    counting <= 1;
+            end
+        end
+        else begin
+            // The autostart input shall be disregarded
             if (internal_start == 1)
                 counting <= 1;
         end
-        else begin
-            if (autostart_expired == 0)
-            begin
-                autostart_expired <= 1;
-                counting <= 1;
-            end
-        end
     end
     else begin
+        // Always respect the stop input
         if (internal_stop == 1)
             counting <= 0;
-        if ((autoreload == 0) && (value >= counter_overflow-1))
-            counting <= 0;
+
+        if (enable_autoreload_input > 0)
+        begin
+            // The autoreload input shall be evaluated
+            if ((autoreload == 0) && (value >= reload_value))
+                counting <= 0;
+        end
+        else begin
+            // The autoreload input shall be disregarded
+            if (value >= reload_value)
+                counting <= 0;
+        end
     end
 end
 
@@ -161,8 +212,8 @@ begin
             overflow <= 0;
         end
 
-        // When reaching the value of counter_overflow, the overflow signal goes high.
-        if (value >= counter_overflow-1)
+        // When reaching the value of period, the overflow signal goes high.
+        if (value >= reload_value)
         begin
             overflow <= 1;
 

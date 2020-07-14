@@ -1,12 +1,15 @@
 `timescale 1ns/1ns
 `define TESTBENCH
 
-`include "common/counter.v"
+`include "counter.v"
 
 
 module test;
 
 initial $dumpvars;
+
+localparam bitwidth = 8;
+
 
 /*
  * Generate test signals
@@ -46,6 +49,12 @@ initial #11 start5 <= 0;
 initial #17 start5 <= 1;
 initial #23 start5 <= 0;
 
+reg start7 = 0;
+initial #7 start7 <= 1;
+initial #9 start7 <= 0;
+initial #49 start7 <= 1;
+initial #50 start7 <= 0;
+
 reg stop7 = 0;
 initial #91 stop7 <= 1;
 initial #93 stop7 <= 0;
@@ -53,17 +62,19 @@ initial #93 stop7 <= 0;
 // End of test signal generation
 initial #150 $finish;
 
-localparam counter_overflow = 12;
+reg[bitwidth-1:0] counter_overflow = 12;
+
 
 /*
  * The effect of a short start signal
  */
 counter #(
-    .counter_overflow(counter_overflow)
+    .bitwidth       (bitwidth)
     )
     counter1 (
         .clock      (clock),
         .reset      (1'b0),
+        .reload_value  (counter_overflow),
         .start      (start1),
         .stop       (1'b0)
         );
@@ -72,11 +83,12 @@ counter #(
  * The effect of a long start signal
  */
 counter #(
-    .counter_overflow(counter_overflow)
+    .bitwidth       (bitwidth)
     )
     counter2 (
         .clock      (clock),
         .reset      (1'b0),
+        .reload_value  (counter_overflow),
         .start      (start2),
         .stop       (1'b0)
         );
@@ -85,11 +97,12 @@ counter #(
  * The effect of a stop signal
  */
 counter #(
-    .counter_overflow(counter_overflow)
+    .bitwidth       (bitwidth)
     )
     counter3 (
         .clock      (clock),
         .reset      (1'b0),
+        .reload_value  (counter_overflow),
         .start      (start2),
         .stop       (stop3)
         );
@@ -98,11 +111,12 @@ counter #(
  * The effect of a reset signal
  */
 counter #(
-    .counter_overflow(counter_overflow)
+    .bitwidth       (bitwidth)
     )
     counter4 (
         .clock      (clock),
         .reset      (reset4),
+        .reload_value  (counter_overflow),
         .start      (start2),
         .stop       (1'b0)
         );
@@ -111,12 +125,13 @@ counter #(
  * The effect of an untimely start signal
  */
 counter #(
-    .counter_overflow(counter_overflow),
-    .start_resets_counting(0)
+    .bitwidth               (bitwidth),
+    .start_resets_counting  (0)
     )
     counter5 (
         .clock      (clock),
         .reset      (1'b0),
+        .reload_value  (counter_overflow),
         .start      (start5),
         .stop       (1'b0)
         );
@@ -125,12 +140,13 @@ counter #(
  * Counter with start as counter reset
  */
 counter #(
-    .counter_overflow(counter_overflow),
-    .start_resets_counting(1)
+    .bitwidth               (bitwidth),
+    .start_resets_counting  (1)
     )
     counter6 (
         .clock      (clock),
         .reset      (1'b0),
+        .reload_value  (counter_overflow),
         .start      (start5),
         .stop       (1'b0)
         );
@@ -138,30 +154,40 @@ counter #(
 /*
  * Counter with autoreload enabled
  */
+reg autoreload = 0;
+initial #40 autoreload <= 1;
+initial #100 autoreload <= 0;
 counter #(
-    .counter_overflow(counter_overflow),
-    .autoreload(1)
+    .bitwidth                   (bitwidth),
+    .enable_autoreload_input    (1)
     )
     counter7 (
         .clock      (clock),
         .reset      (1'b0),
-        .start      (start1),
+        .autoreload (autoreload),
+        .reload_value  (counter_overflow),
+        .start      (start7),
         .stop       (stop7)
         );
 
 /*
  * Counter with autostart enabled
  */
+reg autostart = 0;
+initial #60 autostart <= 1;
 counter #(
-    .counter_overflow(counter_overflow),
-    .autostart(1),
-    .autoreload(1)
+    .bitwidth                   (bitwidth),
+    .enable_autostart_input     (1),
+    .enable_autoreload_input    (1)
     )
     counter8 (
         .clock      (clock),
         .reset      (1'b0),
-        .start      (start1),
-        .stop       (stop7)
+        .autostart  (autostart),
+        .autoreload (autoreload),
+        .reload_value  (counter_overflow),
+        .start      (1'b0),
+        .stop       (1'b0)
         );
 
 
