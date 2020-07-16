@@ -1,6 +1,6 @@
 `timescale 1ns/1ns
 
-`include "pwm.v"
+`include "pwm/advanced.v"
 
 module test;
 
@@ -19,41 +19,30 @@ initial #9 reset <= 0;
 initial #6000 $finish;
 
 
-/*
- * Test the generation of all the trigger signals
- */
-wire[7:0] count;
-wire overflow;
-counter #(
-        .counter_overflow   (20),
-        .autostart          (1),
-        .autoreload         (1),
-        .bitwidth           (8)
-    )
-    counter0 (
-        .clock      (clock),
-        .reset      (reset),
-        .count      (count),
-        .start      (1'b0),
-        .stop       (1'b0),
-        .overflow   (overflow)
-        );
+
+localparam bitwidth = 8;
+reg[bitwidth-1:0] tick_count_period = 20;
+reg[bitwidth-1:0] tick_count_highside = 7;
+reg[bitwidth-1:0] tick_count_lowside = 8;
+reg[bitwidth-1:0] deadtime_hs_to_ls = 3;
+reg[bitwidth-1:0] deadtime_ls_to_hs = 2;
+
 
 pwm #(
-        .deadtime_hs_to_ls  (3),
-        .deadtime_ls_to_hs  (2),
-        .tick_count_period  (20),
-        .bitwidth           (8)
+        .use_external_counter   (0),
+        .bitwidth               (bitwidth)
     )
     pwm0 (
         .clock                  (clock),
         .reset                  (reset),
 
-        .tick_counter           (count),
+        .tick_count_period      (tick_count_period),
+        .tick_count_highside    (tick_count_highside),
+        .tick_count_lowside     (tick_count_lowside),
+        .deadtime_hs_to_ls      (deadtime_hs_to_ls),
+        .deadtime_ls_to_hs      (deadtime_ls_to_hs),
 
-        .load_enable            (overflow),
-        .tick_count_highside    (8'd2),
-        .tick_count_lowside     (8'd3)
+        .configuration_load_enable  (1'b1)
         );
 
 

@@ -1,20 +1,22 @@
 [*]
-[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Wed Feb 26 12:42:32 2020
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Jul 16 14:43:44 2020
 [*]
 [dumpfile] "testbench.lx2"
-[dumpfile_mtime] "Wed Feb 26 12:42:19 2020"
-[dumpfile_size] 16774
+[dumpfile_mtime] "Thu Jul 16 14:42:01 2020"
+[dumpfile_size] 16813
 [savefile] "testbench.gtkw"
 [timestart] 0
 [size] 1920 992
 [pos] -1 -1
-*-4.988071 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-3.988071 19 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test.
-[sst_width] 327
-[signals_width] 361
+[treeopen] test.pwm0.
+[treeopen] test.pwm0.genblk1.
+[sst_width] 377
+[signals_width] 473
 [sst_expanded] 1
-[sst_vpaned_height] 475
+[sst_vpaned_height] 364
 @28
 test.pwm0.clock[0]
 test.reset[0]
@@ -22,32 +24,71 @@ test.reset[0]
 -
 -PWM counter:
 @28
-test.counter0.reset[0]
-test.counter0.start[0]
-test.counter0.internal_start[0]
-test.counter0.stop[0]
-test.counter0.counting[0]
+test.pwm0.genblk1.pwm_counter.start[0]
+test.pwm0.genblk1.pwm_counter.stop[0]
+test.pwm0.genblk1.pwm_counter.reset[0]
 @24
-test.counter0.count[7:0]
+test.pwm0.genblk1.pwm_counter.value[7:0]
+@28
+test.pwm0.genblk1.pwm_counter.counting[0]
+test.pwm0.genblk1.pwm_counter.overflow[0]
 @200
 -
--PWM generator:
-@28
-[color] 2
-test.pwm0.load_enable[0]
+-PWM configuration:
 @24
+[color] 2
+test.pwm0.deadtime_ls_to_hs[7:0]
 [color] 2
 test.pwm0.tick_count_highside[7:0]
 [color] 2
-test.pwm0.tick_number_rising_edge_highside[7:0]
-[color] 2
-test.pwm0.tick_number_falling_edge_highside[7:0]
+test.pwm0.deadtime_hs_to_ls[7:0]
 [color] 2
 test.pwm0.tick_count_lowside[7:0]
+@29
 [color] 2
+test.pwm0.configuration_load_enable[0]
+@28
+[color] 2
+test.pwm0.genblk1.pwm_counter.autostart[0]
+[color] 2
+test.pwm0.genblk1.pwm_counter.autoreload[0]
+@200
+-
+-Configuration change detection:
+@24
+test.pwm0.tick_count_period[7:0]
+[color] 4
+test.pwm0.previous_tick_count_period[7:0]
+[color] 4
+test.pwm0.tick_number_rising_edge_highside[7:0]
+[color] 4
+test.pwm0.previous_tick_number_rising_edge_highside[7:0]
+[color] 4
+test.pwm0.tick_number_falling_edge_highside[7:0]
+[color] 4
+test.pwm0.previous_tick_number_falling_edge_highside[7:0]
+[color] 4
 test.pwm0.tick_number_rising_edge_lowside[7:0]
-[color] 2
+[color] 4
+test.pwm0.previous_tick_number_rising_edge_lowside[7:0]
+[color] 4
 test.pwm0.tick_number_falling_edge_lowside[7:0]
+[color] 4
+test.pwm0.previous_tick_number_falling_edge_lowside[7:0]
+@28
+test.pwm0.configuration_unchanged[0]
+test.pwm0.configuration_valid[0]
+@200
+-
+-Internally used values:
+@24
+test.pwm0.internal_tick_count_period[7:0]
+test.pwm0.internal_tick_number_rising_edge_highside[7:0]
+test.pwm0.internal_tick_number_falling_edge_highside[7:0]
+test.pwm0.internal_tick_number_rising_edge_lowside[7:0]
+test.pwm0.internal_tick_number_falling_edge_lowside[7:0]
+@28
+test.pwm0.internal_reset[0]
 @200
 -
 -Generated gate signals:

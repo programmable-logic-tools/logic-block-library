@@ -6,11 +6,13 @@
 
 SRCS = $(wildcard testbench*.v)
 
+IVFLAGS += -I../../counter/
 IVFLAGS += -I../../
 IVFLAGS += -I../
 
 
 all: simulate
+	../../testbenches/gtkw_mangler.py $(WAVEPROJECTS)
 
 include ../../testbenches/testbench.mk
 

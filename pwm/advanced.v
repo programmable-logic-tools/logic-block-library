@@ -13,9 +13,9 @@
 module pwm
     #(
         /**
-         * Enabling this parameter disables instantiation of an internal counter
-         * in favor of an external counter input.
-         * PWM and external counter must have the same bitwidth.
+         * Set this parameter to a non-zero value in order to disable
+         * instantiation of an internal counter in favor of an external counter input.
+         * Caveat: PWM and external counter must have the same bitwidth.
          */
         parameter use_external_counter = 0,
 
@@ -47,12 +47,6 @@ module pwm
 
 
         /**
-         * The configuration values below are only adopted, when this signal is high.
-         * Do not leave this input unconnected!
-         */
-        input load_enable,
-
-        /**
          * The total number of ticks in one PWM period.
          */
         input[bitwidth-1:0] tick_count_period,
@@ -78,6 +72,23 @@ module pwm
          * falling edge of the lowside and the rising edge of the highside.
          */
         input[bitwidth-1:0] deadtime_ls_to_hs,
+
+        /**
+         * The configuration values below are only adopted, when this signal is high.
+         * Leaving this input unconnected may render the PWM inactive.
+         */
+        input configuration_load_enable,
+
+        /**
+         * This signal indicates whether the tick calculations are complete.
+         */
+        output reg configuration_unchanged,
+
+        /**
+         * This signal indicates whether the tick counts are acceptable.
+         * When the configuration is not valid, both PWM outputs remain low.
+         */
+        output reg configuration_valid,
 
 
         /**
@@ -107,7 +118,7 @@ wire[bitwidth-1:0] t4 = t3 + tick_count_lowside;
 
 always @(posedge clock)
 begin
-    if (load_enable == 1)
+    if (configuration_load_enable == 1)
     begin
         // Update highside registers
         tick_number_rising_edge_highside  <= t1;
@@ -133,21 +144,32 @@ reg[bitwidth-1:0] previous_tick_number_falling_edge_lowside  = 0;
  * Configuration values are considered loadable,
  * when they remain unchanged for at least one clock cycle.
  */
-reg configuration_loadable = 0;
+initial configuration_unchanged <= 0;
+initial configuration_valid <= 0;
 
 always @(posedge clock)
 begin
-    configuration_loadable <= 1;
-    if (
-        (tick_count_period                 != previous_tick_count_period)
-     || (tick_number_rising_edge_highside  != previous_tick_number_rising_edge_highside)
-     || (tick_number_falling_edge_highside != previous_tick_number_falling_edge_highside)
-     || (tick_number_rising_edge_lowside   != previous_tick_number_rising_edge_lowside)
-     || (tick_number_falling_edge_lowside  != previous_tick_number_falling_edge_lowside)
-     )
-    begin
-        configuration_loadable <= 0;
-    end
+    configuration_unchanged <= (
+            (tick_count_period                 == previous_tick_count_period)
+         && (tick_number_rising_edge_highside  == previous_tick_number_rising_edge_highside)
+         && (tick_number_falling_edge_highside == previous_tick_number_falling_edge_highside)
+         && (tick_number_rising_edge_lowside   == previous_tick_number_rising_edge_lowside)
+         && (tick_number_falling_edge_lowside  == previous_tick_number_falling_edge_lowside)
+         );
+
+    previous_tick_count_period                  <= tick_count_period;
+    previous_tick_number_rising_edge_highside   <= tick_number_rising_edge_highside;
+    previous_tick_number_falling_edge_highside  <= tick_number_falling_edge_highside;
+    previous_tick_number_rising_edge_lowside    <= tick_number_rising_edge_lowside;
+    previous_tick_number_falling_edge_lowside   <= tick_number_falling_edge_lowside;
+
+    configuration_valid <= (
+            (tick_count_period > 0)
+         && (tick_number_rising_edge_highside < tick_number_falling_edge_highside)
+         && (tick_number_falling_edge_highside <= tick_number_rising_edge_lowside)
+         && (tick_number_rising_edge_lowside < tick_number_falling_edge_lowside)
+         && (tick_number_falling_edge_lowside <= tick_count_period)
+         );
 end
 
 
@@ -156,13 +178,17 @@ end
  */
 always @(posedge update_event)
 begin
-    if (configuration_loadable == 1)
+    if (
+           (configuration_unchanged == 1)
+        && (configuration_valid == 1)
+        )
     begin
-        shadow_tick_count_period                 = tick_count_period;
-        shadow_tick_number_rising_edge_highside  = tick_number_rising_edge_highside;
-        shadow_tick_number_falling_edge_highside = tick_number_falling_edge_highside;
-        shadow_tick_number_rising_edge_lowside   = tick_number_rising_edge_lowside;
-        shadow_tick_number_falling_edge_lowside  = tick_number_falling_edge_lowside;
+        // internal_tick_count_period                 = tick_count_period - 1;
+        internal_tick_count_period                 = tick_count_period;
+        internal_tick_number_rising_edge_highside  = tick_number_rising_edge_highside;
+        internal_tick_number_falling_edge_highside = tick_number_falling_edge_highside;
+        internal_tick_number_rising_edge_lowside   = tick_number_rising_edge_lowside;
+        internal_tick_number_falling_edge_lowside  = tick_number_falling_edge_lowside;
     end
 end
 
@@ -173,18 +199,25 @@ end
 if (use_external_counter == 0)
 begin
     counter #(
-            .autostart          (1),
-            .autoreload         (1),
-            .bitwidth           (bitwidth)
+            .bitwidth                   (bitwidth),
+            .enable_start_pulsifier     (0),
+            .enable_stop_pulsifier      (0),
+            .enable_autostart_input     (1),
+            .enable_autoreload_input    (1)
         )
         pwm_counter (
-            .clock      (clock),
-            .reset      (reset),
-            .period     (shadow_tick_count_period[bitwidth-1:0]),
-            .count      (counter_value[bitwidth-1:0]),
-            .start      (1'b0),
-            .stop       (1'b0),
-            .overflow   (counter_overflow)
+            .clock          (clock),
+            .reset          (reset),
+
+            // The counter starts automatically, unless held in reset.
+            .start          (1'b0),
+            .stop           (1'b0),
+            .autostart      (1'b1),
+            .autoreload     (1'b1),
+
+            .reload_value   (internal_tick_count_period[bitwidth-1:0]),
+            .value          (counter_value[bitwidth-1:0]),
+            .overflow       (counter_overflow)
             );
 end
 else begin
@@ -194,23 +227,26 @@ end
 
 
 /*
- * The actually used pulse configuration values
+ * The internally used configuration values
  */
-reg[bitwidth-1:0] shadow_tick_count_period                 = 0;
-reg[bitwidth-1:0] shadow_tick_number_rising_edge_highside  = 0;
-reg[bitwidth-1:0] shadow_tick_number_falling_edge_highside = 0;
-reg[bitwidth-1:0] shadow_tick_number_rising_edge_lowside   = 0;
-reg[bitwidth-1:0] shadow_tick_number_falling_edge_lowside  = 0;
+reg[bitwidth-1:0] internal_tick_count_period                 = 0;
+reg[bitwidth-1:0] internal_tick_number_rising_edge_highside  = 0;
+reg[bitwidth-1:0] internal_tick_number_falling_edge_highside = 0;
+reg[bitwidth-1:0] internal_tick_number_rising_edge_lowside   = 0;
+reg[bitwidth-1:0] internal_tick_number_falling_edge_lowside  = 0;
+
+// Invalid configuration disable the PWM outputs.
+wire internal_reset = reset | (~configuration_valid);
 
 pulse #(
         .bitwidth                   (bitwidth)
     )
     gate_highside (
         .clock                      (clock),
-        .reset                      (reset),
-        .counter                    (tick_counter[bitwidth-1:0]),
-        .tick_number_rising_edge    (shadow_tick_number_rising_edge_highside[bitwidth-1:0]),
-        .tick_number_falling_edge   (shadow_tick_number_falling_edge_highside[bitwidth-1:0]),
+        .reset                      (internal_reset),
+        .counter_value              (counter_value[bitwidth-1:0]),
+        .tick_number_rising_edge    (internal_tick_number_rising_edge_highside[bitwidth-1:0]),
+        .tick_number_falling_edge   (internal_tick_number_falling_edge_highside[bitwidth-1:0]),
         .generated_signal           (highside_output)
         );
 
@@ -219,10 +255,10 @@ pulse #(
     )
     gate_lowside (
         .clock                      (clock),
-        .reset                      (reset),
-        .counter                    (tick_counter[bitwidth-1:0]),
-        .tick_number_rising_edge    (shadow_tick_number_rising_edge_lowside[bitwidth-1:0]),
-        .tick_number_falling_edge   (shadow_tick_number_falling_edge_lowside[bitwidth-1:0]),
+        .reset                      (internal_reset),
+        .counter_value              (counter_value[bitwidth-1:0]),
+        .tick_number_rising_edge    (internal_tick_number_rising_edge_lowside[bitwidth-1:0]),
+        .tick_number_falling_edge   (internal_tick_number_falling_edge_lowside[bitwidth-1:0]),
         .generated_signal           (lowside_output)
         );
 
