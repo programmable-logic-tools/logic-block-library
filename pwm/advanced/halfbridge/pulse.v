@@ -1,3 +1,8 @@
+/**
+ * This module generates a pulse which is characterized
+ * by the tick numbers of it's rising and falling edges respectively.
+ */
+
 
 `ifndef PULSE_V
 `define PULSE_V

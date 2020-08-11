@@ -145,7 +145,6 @@ reg[bitwidth-1:0] previous_tick_number_falling_edge_lowside  = 0;
  * when they remain unchanged for at least one clock cycle.
  */
 initial configuration_unchanged <= 0;
-initial configuration_valid <= 0;
 
 always @(posedge clock)
 begin
@@ -162,14 +161,6 @@ begin
     previous_tick_number_falling_edge_highside  <= tick_number_falling_edge_highside;
     previous_tick_number_rising_edge_lowside    <= tick_number_rising_edge_lowside;
     previous_tick_number_falling_edge_lowside   <= tick_number_falling_edge_lowside;
-
-    configuration_valid <= (
-            (tick_count_period > 0)
-         && (tick_number_rising_edge_highside < tick_number_falling_edge_highside)
-         && (tick_number_falling_edge_highside <= tick_number_rising_edge_lowside)
-         && (tick_number_rising_edge_lowside < tick_number_falling_edge_lowside)
-         && (tick_number_falling_edge_lowside <= tick_count_period)
-         );
 end
 
 
