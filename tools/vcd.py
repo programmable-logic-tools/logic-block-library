@@ -19,7 +19,7 @@ class VCD_Timeseries:
     def __init__(self, line=None, lineNumber=None):
         self.type = ""
         self.bitwidth = 0
-        self.symbol = ""
+        self.id = ""
         self.label = ""
         self.range = ""
         self.datapoints = []
@@ -44,7 +44,7 @@ class VCD_Timeseries:
         if self.bitwidth > 1:
             expectedKeyCount = 7
 
-        self.symbol = keys[3]
+        self.id = keys[3]
         self.label = keys[4]
 
         self.range = "[0:0]"
@@ -65,6 +65,9 @@ class VCD_Timeseries:
 
     def getLabel(self):
         return self.label
+
+    def getID(self):
+        return self.id
 
 
 #
@@ -105,6 +108,7 @@ class VCD:
 
         # Parse line by line
         lineNumber = 0
+        timestamp = 0
         for line in lines:
             lineNumber += 1
 
@@ -114,12 +118,71 @@ class VCD:
 
             # Detect variable/signal declarations
             if line[:5] == "$var ":
+                # Create new timeseries
                 timeseries = VCD_Timeseries(line, lineNumber)
                 self.timeserieses += [timeseries]
                 self.log("Found signal declaration on line {:d}: {:s}".format(lineNumber, timeseries.getLabel()))
                 continue
 
+            # VCD keywords start with $
+            if line[0] == "$":
+                # No need to evaluate them
+                continue
+
+            # VCD values start with a tab
+            if line[0] == "\t":
+                # No need to evaluate them
+                continue
+
+            # Timestamps start with #
+            if line[0] == "#":
+                timestamp = int(line[1:])
+                self.log("Time = {:d}...".format(timestamp))
+                continue
+
+            # bitwidth > 1: Stored as binary Verilog vector
+            failMsg = "Warning: Failed parse line {:d}. Skipping.".format(lineNumber)
+            if line[0] == "b":
+                s = line.split(" ")
+                if len(s) < 2:
+                    self.log(failMsg)
+                    continue
+                value = s[0]
+                id = s[1]
+            elif line[0] in ["0", "1", "z"]:
+                if len(line) < 2:
+                    self.log(failMsg)
+                    continue
+                value = line[0]
+                id = line[1:]
+            else:
+                self.log(failMsg)
+                continue
+
+            timeseries = self.getTimeseriesByID(id)
+            if timeseries is None:
+                self.log("Error: Timeseries with ID \"{:s}\" not found. Skipping.".format(id))
+                continue
+            timeseries.addDatapoint(timestamp, value)
+            label = timeseries.getLabel()
+            self.log("Added datapoint ({:d}, {:s}) to timeseries for \"{:s}\".".format(timestamp, value, label))
+
         self.log("Finished importing {:d} lines.".format(lineNumber))
+
+    def getTimeseriesCount(self):
+        return len(self.timeserieses)
+
+    def getTimeseriesByLabel(self, label):
+        for t in self.timeserieses:
+            if t.getLabel() == label:
+                return t
+        return None
+
+    def getTimeseriesByID(self, id):
+        for t in self.timeserieses:
+            if t.getID() == id:
+                return t
+        return None
 
 
 if __name__ == "__main__":
