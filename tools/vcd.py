@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+import svgwrite
 
 
 #
@@ -10,6 +11,12 @@ class VCD_Datapoint:
     def __init__(self, time, value):
         self.time = time
         self.value = value
+
+    def getTime(self):
+        return self.time
+
+    def getValue(self):
+        return self.value
 
 
 #
@@ -68,6 +75,35 @@ class VCD_Timeseries:
 
     def getID(self):
         return self.id
+
+    def drawToSVG(self, drawing, offsetY=0):
+        stroke = svgwrite.rgb(10, 10, 16, '%')
+        scaleY = 10
+
+        previousTime = None
+        previousValue = None
+        for p in self.datapoints:
+            time = p.getTime()
+            value = p.getValue()
+
+            if previousTime != None:
+                x1 = previousTime
+                y1 = 0
+                if (previousValue == 1) or (previousValue == "1"):
+                    y1 = 1
+                y1 *= scaleY
+                y1 += offsetY
+                x2 = time
+                y2 = 0
+                if (value == 1) or (value == "1"):
+                    y2 = 1
+                y2 *= scaleY
+                y2 += offsetY
+                drawing.add(drawing.line((x1, y1), (x2, y1), stroke=stroke))
+                drawing.add(drawing.line((x2, y1), (x2, y2), stroke=stroke))
+
+            previousTime = time
+            previousValue = value
 
 
 #
@@ -183,6 +219,26 @@ class VCD:
             if t.getID() == id:
                 return t
         return None
+
+    def generateSVG(self):
+        drawing = svgwrite.Drawing()
+
+        # X axis
+        drawing.add(drawing.line((0, 0), (0, 100), stroke=svgwrite.rgb(10, 10, 16, '%')))
+        # Y axis
+        drawing.add(drawing.line((0, 0), (100, 0), stroke=svgwrite.rgb(10, 10, 16, '%')))
+
+        # Timeserieses
+        offsetY = 10
+        for t in self.timeserieses:
+            t.drawToSVG(drawing, offsetY)
+            offsetY += 20
+
+        return drawing
+
+    def exportSVG(self, filename):
+        drawing = self.generateSVG()
+        drawing.saveas(filename, pretty=True, indent=4)
 
 
 if __name__ == "__main__":

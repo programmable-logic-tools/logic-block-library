@@ -1,0 +1,16 @@
+
+# Generated plots
+*.m
+*.csv
+*.tsv
+*.ods
+*.xls
+*.xlsx
+*.xml
+*.svg
+*.svgz
+*.png
+*.jpg
+*.tif
+*.tiff
+*.gif
