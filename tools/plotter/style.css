@@ -1,0 +1,10 @@
+.waveform
+{
+    fill: none;
+    stroke: black;
+    stroke-width: 0.2;
+    stroke-miterlimit: 4;
+    stroke-dasharray: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

@@ -76,9 +76,20 @@ class VCD_Timeseries:
     def getID(self):
         return self.id
 
-    def drawToSVG(self, drawing, offsetY=0):
-        stroke = svgwrite.rgb(10, 10, 16, '%')
+    def getMaxTime(self):
+        time = 0
+        for p in self.datapoints:
+            t = p.getTime()
+            if t > time:
+                time = t
+        return time
+
+    def drawToSVG(self, drawing, offsetY=0, maxTime=100):
+        if len(self.datapoints) == 0:
+            return
+
         scaleY = 10
+        d = ""
 
         previousTime = None
         previousValue = None
@@ -86,7 +97,18 @@ class VCD_Timeseries:
             time = p.getTime()
             value = p.getValue()
 
-            if previousTime != None:
+            if previousTime is None:
+                # Append absolute moveto to path
+                if value == "1":
+                    value = 1
+                else:
+                    value = 0
+                value *= scaleY
+                value += offsetY
+                moveto = "M{:d} {:d} ".format(time, value)
+                d += moveto
+            else:
+                # Append relative lineto to path
                 x1 = previousTime
                 y1 = 0
                 if (previousValue == 1) or (previousValue == "1"):
@@ -99,11 +121,23 @@ class VCD_Timeseries:
                     y2 = 1
                 y2 *= scaleY
                 y2 += offsetY
-                drawing.add(drawing.line((x1, y1), (x2, y1), stroke=stroke))
-                drawing.add(drawing.line((x2, y1), (x2, y2), stroke=stroke))
+                line1 = "L{:d} {:d} ".format(x2, y1)
+                line2 = "L{:d} {:d} ".format(x2, y2)
+                d += line1 + line2
 
             previousTime = time
             previousValue = value
+
+        # Close path and append path to SVG
+        value = 0
+        if previousValue == 1:
+            value = 1
+        value *= scaleY
+        value += offsetY
+        d += "L{:d} {:d}".format(maxTime, value)
+        # print(d)
+        path = drawing.path(d=d, **{"class":"waveform"})
+        drawing.add(path)
 
 
 #
@@ -220,19 +254,38 @@ class VCD:
                 return t
         return None
 
+    def getMaxTime(self):
+        time = 0
+        for ts in self.timeserieses:
+            t = ts.getMaxTime()
+            if t > time:
+                time = t
+        return time
+
     def generateSVG(self):
         drawing = svgwrite.Drawing()
 
-        # X axis
-        drawing.add(drawing.line((0, 0), (0, 100), stroke=svgwrite.rgb(10, 10, 16, '%')))
-        # Y axis
-        drawing.add(drawing.line((0, 0), (100, 0), stroke=svgwrite.rgb(10, 10, 16, '%')))
+        # Embed stylesheet
+        f = open("style.css" ,"r")
+        stylesheet = f.read()
+        f.close()
+        style = drawing.style(stylesheet)
+        drawing.defs.add(style)
 
         # Timeserieses
         offsetY = 10
+        maxTime = self.getMaxTime()
         for t in self.timeserieses:
-            t.drawToSVG(drawing, offsetY)
+            t.drawToSVG(drawing, offsetY=offsetY, maxTime=maxTime)
             offsetY += 20
+
+        maxX = self.getMaxTime()
+        maxY = offsetY
+
+        # X axis
+        drawing.add(drawing.line((0, 0), (0, maxY), stroke=svgwrite.rgb(10, 10, 16, '%')))
+        # Y axis
+        drawing.add(drawing.line((0, 0), (maxX, 0), stroke=svgwrite.rgb(10, 10, 16, '%')))
 
         return drawing
 
