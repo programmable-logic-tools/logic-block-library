@@ -18,6 +18,10 @@ simulate: $(WAVEFILES)
 	vvp $^ -lxt2
 	mv dump.lx2 $(^:.vvp=.lx2)
 
+%.vcd: %.vvp
+	vvp $^ -vcd
+	mv dump.vcd $(^:.vvp=.vcd)
+
 # Before the results can be shown, they must be generated.
 show: simulate $(WAVEPROJECTS)
 
@@ -26,3 +30,4 @@ show: simulate $(WAVEPROJECTS)
 
 clean-testbench:
 	rm -f $(WAVEFILES) $(TESTBENCHES)
+
