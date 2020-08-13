@@ -84,13 +84,11 @@ class VCD_Timeseries:
                 time = t
         return time
 
-    def drawToSVG(self, drawing, offsetY=0, maxTime=100):
+    def drawToSVG(self, drawing, offsetY=0, scaleY=10, maxTime=100):
         if len(self.datapoints) == 0:
             return
 
-        scaleY = 10
         d = ""
-
         previousTime = None
         previousValue = None
         for p in self.datapoints:
@@ -262,7 +260,7 @@ class VCD:
                 time = t
         return time
 
-    def generateSVG(self):
+    def generateSVG(self, offsetY=10, scaleY=10, spacingY=20):
         drawing = svgwrite.Drawing()
 
         # Embed stylesheet
@@ -273,11 +271,10 @@ class VCD:
         drawing.defs.add(style)
 
         # Timeserieses
-        offsetY = 10
         maxTime = self.getMaxTime()
         for t in self.timeserieses:
-            t.drawToSVG(drawing, offsetY=offsetY, maxTime=maxTime)
-            offsetY += 20
+            t.drawToSVG(drawing, offsetY=offsetY, scaleY=scaleY, maxTime=maxTime)
+            offsetY += spacingY
 
         maxX = self.getMaxTime()
         maxY = offsetY
