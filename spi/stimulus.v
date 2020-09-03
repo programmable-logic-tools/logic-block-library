@@ -25,6 +25,8 @@
 `ifndef SPI_STIMULUS_V
 `define SPI_STIMULUS_V
 
+`include "../pulsifier.v"
+
 module spi_stimulus
     #(
         /**
@@ -67,7 +69,18 @@ module spi_stimulus
          * Number of clock ticks at the trailing edge of the slave-select signal,
          * after which the completion indicating signal shall change.
          */
-        parameter tick_count_complete_delay_trailing = 0
+        parameter tick_count_complete_delay_trailing = 0,
+
+        /**
+         * Convert the trigger input into a pulse
+         * or use the unfiltered input signal.
+         *
+         * CAVEAT:
+         * When the trigger pulsifier is disabled, the trigger input acts
+         * as a stimulus enable signal, i.e. stimulus generation will repeat
+         * until after the trigger input has returned to low.
+         */
+        parameter enable_trigger_pulsifier = 1
         )
     (
         input clock,
@@ -88,6 +101,22 @@ initial complete <= 0;
 initial aborted <= 0;
 initial valid <= 0;
 
+
+/**
+ * The internal start signal can be chosen
+ * to either be the unfiltered input trigger
+ * or the pulsified input trigger.
+ */
+wire internal_trigger;
+if (enable_trigger_pulsifier == 0)
+    assign internal_trigger = trigger;
+else begin
+    pulsifier trigger_pulsifier(
+        .clock(clock),
+        .original_signal(trigger),
+        .pulsified_signal(internal_trigger)
+        );
+end
 
 /**
  * The internal slave/chip-select signal
@@ -147,7 +176,7 @@ begin
             sclk_delay_counter <= 0;
 
             // Wait for activation
-            if (trigger == 1)
+            if (internal_trigger == 1)
             begin
                 complete <= 0;
                 aborted <= 0;
