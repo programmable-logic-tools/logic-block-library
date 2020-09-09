@@ -224,9 +224,8 @@ end
  * it takes a while for the on- and off-time calculations to complete.
  */
 counter #(
-        .counter_overflow       (tick_count_calculation_delay),
-        .autostart              (1),
-        .autoreload             (0),
+        .enable_autostart_input (0),
+        .enable_autoreload_input(0),
         .enable_reset_pulsifier (1),
         .reset_pulse_duration   (1),
         .enable_start_pulsifier (1),
@@ -238,6 +237,7 @@ counter #(
         .reset          (invalidate_input_values),
         .start          (load_input_values),
         .stop           (1'b0),
+        .reload_value   (tick_count_calculation_delay),
         .overflow       (calculation_complete)
         );
 
