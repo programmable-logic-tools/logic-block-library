@@ -41,6 +41,12 @@ module counter #(
             parameter start_resets_counting = 0,
 
             /**
+             * This parameter configures, whether the reset signal is used as is or pulsified internally.
+             */
+            parameter enable_reset_pulsifier = 0,
+            parameter reset_pulse_duration = 1,
+
+            /**
              * This parameter configures, whether the start signal is used as is or pulsified internally.
              */
             parameter enable_start_pulsifier = 1,
@@ -113,6 +119,25 @@ initial counting <= 0;
 initial overflow <= 0;
 
 /*
+ * Pulsify the reset signal, if this is configured
+ */
+wire internal_reset;
+if (enable_reset_pulsifier == 0)
+begin
+    assign internal_reset = reset;
+end
+else begin
+    pulsifier #(
+        .pulse_duration     (reset_pulse_duration)
+        )
+        pulsify_reset (
+        .clock              (clock),
+        .original_signal    (reset),
+        .pulsified_signal   (internal_reset)
+        );
+end
+
+/*
  * Pulsify the start signal, if this is configured
  */
 wire internal_start;
@@ -183,7 +208,7 @@ begin
                     counting <= 1;
             end
             else begin
-                if ((value == 0) && (reset == 0))
+                if ((value == 0) && (internal_reset == 0))
                     counting <= 1;
             end
         end
@@ -219,9 +244,9 @@ end
 /*
  * The actual counting:
  */
-always @(posedge clock or posedge reset)
+always @(posedge clock or posedge internal_reset)
 begin
-    if (reset == 1)
+    if (internal_reset == 1)
     begin
         /*
          * A rising edge or high level on the reset signal resets the counter value.
