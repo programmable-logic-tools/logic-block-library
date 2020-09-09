@@ -15,7 +15,7 @@ module pwm
         parameter deadtime_hs_to_ls = 12,
         parameter deadtime_ls_to_hs = 12,
         parameter tick_count_period = 100,
-        parameter bitwidth = $clog2(tick_count_period)+1,
+        parameter bitwidth = $clog2(tick_count_period+1)+1,
 
         /**
          * The minimal number of clock ticks a digital gate signal must remain high
@@ -34,6 +34,10 @@ module pwm
          * such that it is no longer possible to turn on the corresponding complementary switch,
          * this parameter configures, whether the PWM should switch to flat-top mode
          * or try to switch the respective semiconductor intermittently.
+         *
+         * TODO:
+         * When intermittent switching is enabled and one output is in flat-bottom state,
+         * the complementary output still switches (with a very high duty cycle).
          */
         parameter enable_intermittent_switching = 0
         )
@@ -203,17 +207,17 @@ begin
         /*
          * Regular PWM, but a deadtime must be added between lowside turn-off to highside turn-on
          */
-        t1 <= deadtime_ls_to_hs;
-        t2 <= t1 + tick_count_highside;
-        t3 <= t2 + deadtime_hs_to_ls;
-        t4 <= t3 + tick_count_lowside - deadtime_ls_to_hs;
+        t1 = deadtime_ls_to_hs;
+        t2 = t1 + tick_count_highside;
+        t3 = t2 + deadtime_hs_to_ls;
+        t4 = t3 + tick_count_lowside - deadtime_ls_to_hs;
     end
     else begin
         // Regular PWM with deadtimes
-        t1 <= 0;
-        t2 <= tick_count_highside;
-        t3 <= t2 + deadtime_hs_to_ls;
-        t4 <= t3 + tick_count_lowside;
+        t1 = 0;
+        t2 = tick_count_highside;
+        t3 = t2 + deadtime_hs_to_ls;
+        t4 = t3 + tick_count_lowside;
         // t4 <= t3 + deadtime_ls_to_hs;
     end
 end
@@ -224,6 +228,7 @@ end
  * it takes a while for the on- and off-time calculations to complete.
  */
 counter #(
+        .bitwidth               ($clog2(tick_count_calculation_delay+1)+1),
         .enable_autostart_input (0),
         .enable_autoreload_input(0),
         .enable_reset_pulsifier (1),
@@ -237,7 +242,7 @@ counter #(
         .reset          (invalidate_input_values),
         .start          (load_input_values),
         .stop           (1'b0),
-        .reload_value   (tick_count_calculation_delay),
+        .overflow_value (tick_count_calculation_delay),
         .overflow       (calculation_complete)
         );
 
@@ -249,10 +254,7 @@ reg disable_highside = 0;
 reg disable_lowside = 0;
 always @(posedge clock)
 begin
-    if (
-         (calculation_complete == 1)
-     && ((tick_counter == 0) || (tick_counter == tick_count_period-1))
-     )
+    if (calculation_complete == 1)
     begin
         // Update highside registers
         tick_number_rising_edge_highside  <= t1;
@@ -293,26 +295,34 @@ begin
             disable_highside <= 0;
             disable_lowside <= 0;
         end
-    end
 
-    /*
-     * Check, if the sum of all times - without the deadtimes because of the DCM mode -
-     * exceeds the period duration.
-     */
-    if (tick_count_highside + tick_count_lowside > tick_count_period)
-    begin
-        calculation_error <= 1;
-    end
+        /*
+         * Check, if the sum of all times - without the deadtimes because of the DCM mode -
+         * exceeds the period duration.
+         */
+        if (tick_count_highside + tick_count_lowside > tick_count_period)
+        begin
+            calculation_error <= 1;
 
-    if (calculation_error == 1)
-    begin
-        // Disable highside
-        tick_number_rising_edge_highside  <= 0;
-        tick_number_falling_edge_highside <= 0;
+            // Disable highside
+            tick_number_rising_edge_highside  <= 0;
+            tick_number_falling_edge_highside <= 0;
 
-        // Disable lowside
-        tick_number_rising_edge_lowside   <= 0;
-        tick_number_falling_edge_lowside  <= 0;
+            // Disable lowside
+            tick_number_rising_edge_lowside   <= 0;
+            tick_number_falling_edge_lowside  <= 0;
+        end
+
+        if (calculation_error == 1)
+        begin
+            // Disable highside
+            tick_number_rising_edge_highside  <= 0;
+            tick_number_falling_edge_highside <= 0;
+
+            // Disable lowside
+            tick_number_rising_edge_lowside   <= 0;
+            tick_number_falling_edge_lowside  <= 0;
+        end
     end
 end
 
