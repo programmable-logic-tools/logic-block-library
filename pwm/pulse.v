@@ -24,10 +24,16 @@ initial generated_signal <= 0;
 
 always @(posedge clock)
 begin
-    if ((counter == tick_number_rising_edge) && (reset == 0))
-        generated_signal <= 1;
-    if ((counter == tick_number_falling_edge) || (reset == 1))
+    if (reset == 1)
+    begin
         generated_signal <= 0;
+    end
+    else begin
+        if ((counter < tick_number_rising_edge) || (counter >= tick_number_falling_edge))
+            generated_signal <= 0;
+        else //if (counter >= tick_number_rising_edge)
+            generated_signal <= 1;
+    end
 end
 
 endmodule
