@@ -17,8 +17,8 @@ module counter #(
             /**
              * The number of bits reserved for the counter value.
              * The maximum allowed auto-reload value is (2^bitwidth)-2,
-             * i.e. bitwidth must be chosen, such that (2^bitwidth)-1 <= (reload_value+1),
-             * because without auto-reload enabled the counter value reaches (reload_value+1).
+             * i.e. bitwidth must be chosen, such that (2^bitwidth)-1 <= (overflow_value+1),
+             * because without auto-reload enabled the counter value reaches (overflow_value+1).
              */
             parameter bitwidth = 8,
 
@@ -93,16 +93,16 @@ module counter #(
             input autoreload,
 
             /**
-             * The counter value after which the
+             * The counter value after(!) which the
              * counter overflows and resets to zero
              */
-            input[bitwidth-1:0] reload_value,
+            input[bitwidth-1:0] overflow_value,
 
             /**
              * The internally used reload value is only updated
              * upon an update i.e. counter overflow event.
              */
-            output reg[bitwidth-1:0] active_reload_value,
+            output reg[bitwidth-1:0] active_overflow_value,
 
             /** A high level on the counting signal indicates, that the counter is currently counting. */
             output reg counting,
@@ -178,24 +178,24 @@ end
 /*
  * Update internally used reload value
  */
-initial active_reload_value <= 0;
-wire illegal_reload_value = (reload_value == 0);
+initial active_overflow_value <= 0;
+wire illegal_overflow_value = (overflow_value == 0);
 wire reload_trigger = (counting == 0) || (overflow == 1);
 always @(posedge clock)
 begin
     if (reload_trigger)
-        active_reload_value[bitwidth-1:0] <= reload_value[bitwidth-1:0];
+        active_overflow_value[bitwidth-1:0] <= overflow_value[bitwidth-1:0];
 end
 
 /*
  * Decide, whether to count or not
  */
-wire overflow_latch = (value >= active_reload_value);
+wire overflow_latch = (value >= active_overflow_value);
 always @(posedge clock)
 begin
     if (counting == 0)
     begin
-        if (illegal_reload_value)
+        if (illegal_overflow_value)
             counting <= 0;
 
         // The counter is inactive
@@ -226,7 +226,7 @@ begin
         if (enable_autoreload_input > 0)
         begin
             // The autoreload input shall be evaluated
-            if ((overflow_latch == 1) && ((autoreload == 0) || (illegal_reload_value == 1)))
+            if ((overflow_latch == 1) && ((autoreload == 0) || (illegal_overflow_value == 1)))
                 counting <= 0;
         end
         else begin
@@ -237,7 +237,7 @@ begin
     end
 
     // When the reload value is zero the counter is blocked.
-    if (active_reload_value == 0)
+    if (active_overflow_value == 0)
         counting <= 0;
 end
 
