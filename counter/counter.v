@@ -11,7 +11,7 @@
 `ifndef COUNTER_V
 `define COUNTER_V
 
-`include "pulsifier.v"
+`include "../pulsifier.v"
 
 module counter #(
             /**

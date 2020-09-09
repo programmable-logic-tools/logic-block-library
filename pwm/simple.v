@@ -3,15 +3,13 @@
  * for one half bridge i.e. one highside and one lowside gate signal.
  */
 
-`ifndef PWM_V
-`define PWM_V
-
-`include "../control/pwm.vh"
+`ifndef PWM_SIMPLE_V
+`define PWM_SIMPLE_V
 
 
 module pwm
     #(
-        parameter bitwidth = `BITWIDTH_PWM_COUNTER
+        parameter bitwidth = 8
         )
     (
         input reset,
