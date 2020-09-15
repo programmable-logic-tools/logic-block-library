@@ -17,7 +17,7 @@ module pulse
         input clock,
         input reset,
         input load_enable,
-        input [bitwidth-1:0] counter,
+        input [bitwidth-1:0] counter_value,
         input [bitwidth-1:0] tick_number_rising_edge,
         input [bitwidth-1:0] tick_number_falling_edge,
 
@@ -65,10 +65,21 @@ begin
         generated_signal <= 0;
     end
     else begin
-        if ((counter < internal_tick_number_rising_edge) || (counter >= internal_tick_number_falling_edge))
-            generated_signal <= 0;
-        else //if (counter >= internal_tick_number_rising_edge)
-            generated_signal <= 1;
+        generated_signal <= 0;
+        if (enable_double_buffering == 0)
+        begin
+            if ((counter_value >= internal_tick_number_rising_edge) && (counter_value < internal_tick_number_falling_edge))
+            begin
+                generated_signal <= 1;
+            end
+        end
+        else begin
+            if (((load_enable == 1) && (counter_value >= tick_number_rising_edge) && (counter_value < tick_number_falling_edge))
+             || ((load_enable == 0) && (counter_value >= internal_tick_number_rising_edge) && (counter_value < internal_tick_number_falling_edge)))
+            begin
+                generated_signal <= 1;
+            end
+        end
     end
 end
 
