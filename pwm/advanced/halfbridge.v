@@ -14,11 +14,16 @@ module pwm_advanced_halfbridge
     (
         input clock,
 
-        /**
-         * While this input is high,
-         * the outputs remain low.
+        /*
+         * While these inputs are high,
+         * the corresponding outputs remain low.
+         *
+         * CAVEAT:
+         * They should explicitly be tied to low
+         * if the outputs should be enabled permanently.
          */
-        input reset,
+        input disable_highside_output,
+        input disable_lowside_output,
 
         /**
          * Output the counter value in case another PWM shall use it as input.
@@ -50,7 +55,7 @@ pulse #(
     )
     gate_highside (
         .clock                      (clock),
-        .reset                      (reset),
+        .reset                      (disable_highside_output),
 
         .load_enable                (load_enable),
         .tick_number_rising_edge    (tick_number_rising_edge_highside[bitwidth-1:0]),
@@ -66,7 +71,7 @@ pulse #(
     )
     gate_lowside (
         .clock                      (clock),
-        .reset                      (reset),
+        .reset                      (disable_lowside_output),
 
         .load_enable                (load_enable),
         .tick_number_rising_edge    (tick_number_rising_edge_lowside[bitwidth-1:0]),
