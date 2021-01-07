@@ -1,0 +1,32 @@
+
+#
+# Onboard oscillator
+#
+set_io clock_12mhz 21
+
+#
+# Onboard LEDs
+# 4x red, 1x green
+#
+set_io led[0] 95
+set_io led[1] 99
+set_io led[2] 96
+set_io led[3] 97
+set_io led[4] 98
+
+#
+# Programming pins
+# listed here to prevent accidental usage in the design
+# TODO...
+#
+
+#
+# UART interface from/to PC
+#
+set_io uart_dcd 1 --warn-no-port
+set_io uart_dsr 2 --warn-no-port
+set_io uart_dtr 3 --warn-no-port
+set_io uart_cts 4 --warn-no-port
+set_io uart_rts 7 --warn-no-port
+set_io uart_tx 8
+set_io uart_rx 9
