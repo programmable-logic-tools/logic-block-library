@@ -1,0 +1,40 @@
+
+#
+# Onboard oscillator
+#
+set_io clock_12mhz J3
+
+#
+# Onboard LEDs
+#
+set_io led[0] B5 --warn-no-port  # labelled 'D9'
+set_io led[1] B4 --warn-no-port  # labelled 'D8'
+set_io led[2] A2 --warn-no-port  # labelled 'D7'
+set_io led[3] A1 --warn-no-port  # labelled 'D6'
+set_io led[4] C5 --warn-no-port  # labelled 'D5'
+set_io led[5] C4 --warn-no-port  # labelled 'D4'
+set_io led[6] B3 --warn-no-port  # labelled 'D3'
+set_io led[7] C3 --warn-no-port  # labelled 'D2'
+
+#
+# Programming pins
+# listed here to prevent accidental usage in the design
+# as those signals are also routed to the pin headers
+#
+set_io iCE_SS     R12 --warn-no-port  # FPGA output or high-Z
+set_io iCE_SCK    R11 --warn-no-port  # FPGA output or high-Z
+set_io iCE_MOSI   P11 --warn-no-port  # FPGA input
+set_io iCE_MISO   P12 --warn-no-port  # FPGA output or high-Z
+#set_io iCE_CDONE  M10 --warn-no-port  # FPGA output
+#set_io iCE_CRESET N11 --warn-no-port  # FPGA input
+
+#
+# UART interface from/to PC via FTDI FT2232H
+#
+set_io uart_dcd B15 --warn-no-port  # FPGA output
+set_io uart_dsr B14 --warn-no-port  # FPGA output
+set_io uart_dtr A16 --warn-no-port  # FPGA input
+set_io uart_cts A15 --warn-no-port  # FPGA output
+set_io uart_rts B13 --warn-no-port  # FPGA input
+set_io uart_tx  B12 --warn-no-port  # FPGA output
+set_io uart_rx  B10 --warn-no-port  # FPGA input
