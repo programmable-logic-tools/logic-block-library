@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 `define TESTBENCH
 
-`include "counter.v"
+`include "counter/counter.v"
 
 
 module test;
@@ -74,7 +74,7 @@ counter #(
     counter1 (
         .clock      (clock),
         .reset      (1'b0),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start1),
         .stop       (1'b0)
         );
@@ -88,7 +88,7 @@ counter #(
     counter2 (
         .clock      (clock),
         .reset      (1'b0),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start2),
         .stop       (1'b0)
         );
@@ -102,7 +102,7 @@ counter #(
     counter3 (
         .clock      (clock),
         .reset      (1'b0),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start2),
         .stop       (stop3)
         );
@@ -116,7 +116,7 @@ counter #(
     counter4 (
         .clock      (clock),
         .reset      (reset4),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start2),
         .stop       (1'b0)
         );
@@ -131,7 +131,7 @@ counter #(
     counter5 (
         .clock      (clock),
         .reset      (1'b0),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start5),
         .stop       (1'b0)
         );
@@ -146,7 +146,7 @@ counter #(
     counter6 (
         .clock      (clock),
         .reset      (1'b0),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start5),
         .stop       (1'b0)
         );
@@ -165,7 +165,7 @@ counter #(
         .clock      (clock),
         .reset      (1'b0),
         .autoreload (autoreload),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (start7),
         .stop       (stop7)
         );
@@ -185,7 +185,7 @@ counter #(
         .reset      (1'b0),
         .autostart  (autostart),
         .autoreload (autoreload),
-        .reload_value  (counter_overflow),
+        .overflow_value (counter_overflow),
         .start      (1'b0),
         .stop       (1'b0)
         );
@@ -193,11 +193,11 @@ counter #(
 /*
  * Reloading the counter with different values
  */
-reg[bitwidth-1:0] reload_value = 12;
-initial #70 reload_value <= 8;
-initial #90 reload_value <= 5;
-initial #110 reload_value <= 1;
-initial #130 reload_value <= 0;
+reg[bitwidth-1:0] overflow_value = 12;
+initial #70 overflow_value <= 8;
+initial #90 overflow_value <= 5;
+initial #110 overflow_value <= 1;
+initial #130 overflow_value <= 0;
 counter #(
     .bitwidth                   (bitwidth),
     .enable_autoreload_input    (1)
@@ -206,7 +206,7 @@ counter #(
         .clock          (clock),
         .reset          (1'b0),
         .autoreload     (1'b1),
-        .reload_value   (reload_value),
+        .overflow_value (counter_overflow),
         .start          (start1),
         .stop           (1'b0)
         );

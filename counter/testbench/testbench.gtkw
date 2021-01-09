@@ -1,13 +1,13 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Jul 14 15:45:22 2020
+[*] Sat Jan  9 19:15:03 2021
 [*]
 [dumpfile] "testbench.lx2"
-[dumpfile_mtime] "Tue Jul 14 15:45:19 2020"
-[dumpfile_size] 1612
+[dumpfile_mtime] "Sat Jan  9 19:14:50 2021"
+[dumpfile_size] 1616
 [savefile] "testbench.gtkw"
-[timestart] 56
-[size] 1920 992
+[timestart] 0
+[size] 1366 680
 [pos] -1 -1
 *-3.988071 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] test.
@@ -15,7 +15,7 @@
 [sst_width] 275
 [signals_width] 358
 [sst_expanded] 1
-[sst_vpaned_height] 474
+[sst_vpaned_height] 405
 @28
 test.clock[0]
 @200
@@ -30,7 +30,7 @@ test.counter1.internal_start[0]
 test.counter1.counting[0]
 @24
 [color] 2
-test.counter1.reload_value[7:0]
+test.counter1.overflow_value[7:0]
 [color] 2
 test.counter1.value[7:0]
 @28
@@ -105,7 +105,7 @@ test.counter7.autostart[0]
 test.counter7.autoreload[0]
 @24
 [color] 2
-test.counter7.reload_value[7:0]
+test.counter7.overflow_value[7:0]
 [color] 2
 test.counter7.value[7:0]
 @28
@@ -120,10 +120,9 @@ test.counter7.overflow[0]
 test.counter8.start[0]
 test.counter8.stop[0]
 test.counter8.autostart[0]
-@29
 test.counter8.autoreload[0]
 @24
-test.counter8.reload_value[7:0]
+test.counter8.overflow_value[7:0]
 test.counter8.value[7:0]
 @28
 test.counter8.counting[0]
@@ -131,9 +130,10 @@ test.counter8.overflow[0]
 @200
 -
 -counter9:
-@28
+@29
 [color] 2
 test.counter9.start[0]
+@28
 [color] 2
 test.counter9.stop[0]
 [color] 2
@@ -142,9 +142,9 @@ test.counter9.autostart[0]
 test.counter9.autoreload[0]
 @24
 [color] 2
-test.counter9.reload_value[7:0]
+test.counter9.overflow_value[7:0]
 [color] 2
-test.counter9.active_reload_value[7:0]
+test.counter9.active_overflow_value[7:0]
 [color] 2
 test.counter9.value[7:0]
 @28

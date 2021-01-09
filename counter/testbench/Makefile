@@ -6,13 +6,13 @@
 
 SRCS = $(wildcard testbench*.v)
 
-IVFLAGS += -I../../
-IVFLAGS += -I../
+LIB_ROOT = ../..
+IVFLAGS += -I$(LIB_ROOT)
+IVFLAGS += -I..
 
 
 all: simulate
-	../../testbenches/gtkw_mangler.py $(WAVEPROJECTS)
 
-include ../../testbenches/testbench.mk
+include $(LIB_ROOT)/testbenches/testbench.mk
 
 clean: clean-testbench
