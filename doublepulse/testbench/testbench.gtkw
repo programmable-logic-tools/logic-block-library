@@ -1,0 +1,62 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Sat Jan  9 15:35:04 2021
+[*]
+[dumpfile] "testbench.lx2"
+[dumpfile_mtime] "Sat Jan  9 15:31:57 2021"
+[dumpfile_size] 15502
+[savefile] "testbench.gtkw"
+[timestart] 0
+[size] 1366 680
+[pos] -1 -1
+*-4.988071 19 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test.
+[treeopen] test.doublepulse_counter.
+[treeopen] test.doublepulse_counter.genblk4.pulsify_start.
+[treeopen] test.doublepulse_instance.
+[sst_width] 307
+[signals_width] 364
+[sst_expanded] 1
+[sst_vpaned_height] 253
+@28
+test.clock[0]
+test.reset[0]
+@200
+-
+-Configuration:
+@25
+test.doublepulse1_on1[31:0]
+@24
+test.doublepulse1_off1[31:0]
+test.doublepulse1_on2[31:0]
+test.doublepulse1_off2[31:0]
+@200
+-
+-Internal signals:
+@28
+test.doublepulse_start[0]
+test.doublepulse_counter.internal_start[0]
+test.doublepulse_counter.internal_stop[0]
+test.doublepulse_counter.internal_reset[0]
+test.doublepulse_counter.reload_trigger[0]
+@24
+test.doublepulse_counter.active_overflow_value[31:0]
+@28
+test.doublepulse_counter.counting[0]
+@24
+test.doublepulse_counter.value[31:0]
+@200
+-
+-External signals:
+@24
+test.doublepulse_counter_value[31:0]
+@28
+test.doublepulse_active[0]
+test.doublepulse_complete[0]
+@200
+-
+-Generated double pulse sequence:
+@28
+test.doublepulse_gate_signal[0]
+[pattern_trace] 1
+[pattern_trace] 0
